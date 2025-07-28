@@ -11,15 +11,11 @@
 
 <div id="narrative">
 	<p> This chart shows the olympic medal counts for countries from 1896 to 2024</p>
+	<label for="countryFocus">Select Country to view:</label>
+	<select id="countryFocus">
+		<option value="All">All Countries</option>
+	</select>
 	<svg id="lineChart" width="1200" height="900"></svg>
-	<button onclick="showExplorer()">Explore Data</button>
-</div>
-
-<div id="explorer" class="hidden">
-	<h2>Explore Olympic Medalists</h2>
-	<label for="countrySelect">Country:</label>
-	<select id="countrySelect"></select>
-
 </div>
 	
 <script>
@@ -40,7 +36,15 @@ const svg = d3.select("#lineChart"),
 	margin = {top: 20, right: 20, bottom: 30, left: 50};
 	
 const years = Array.from(new Set(data.map(d => +d.year))).sort();
-const countries = Array.from(new Set(data.map(d => d.country)));
+const countries = Array.from(new Set(data.map(d => d.country))).sort();
+
+const focusSelect = d3.select("#countryFocus");
+focusSelect.selectAll("option")
+	.data(["All", ...countries])
+	.enter()
+	.append("option")
+	.text(d => d)
+	.attr("value", d => d);
 
 const medalCounts = d3.rollup(data,
 	v => v.length,
@@ -75,52 +79,36 @@ svg.append("text")
 	.attr("transform", 'rotate(-90)')
 	.attr("x", -height / 2)
 	.attr("y", 15)
-	.attr("font-size", "12px")
+	.attr("font-size", "18px")
 	.text("Medal Count per Country");
 
 const color = d3.scaleOrdinal(d3.schemeCategory10).domain(countries);
 
 for (const country of countries) {
 	const countryData = years.map(y => [y, medalCounts.get(country)?.get(y) || 0]);
+	
 	svg.append("path")
 	.datum(countryData)
 	.attr("fill", "none")
 	.attr("stroke", color(country))
 	.attr("stroke-width", 2)
+	.attr("class", "country-line")
+	.attr("data-country", country)
 	.attr("d", line);
 }
 
-const countrySelect = d3.select("#countrySelect");
+focusSelect.on("change", function() {
+	const selected = this.value;
+	
+	d3.selectAll(".country-line")
+	.transition()
+	.duration(500)
+	.style("opacity", d => {
+		const country = d3.select(d3.event ? this : this).attr("data-country);
+		return (selected === "All" || d3.select(this.attr("data-country") === selected) ? 1 : 0.1;
+	});
 
-countrySelect.selectAll("option")
-	.data(countries)
-	.enter()
-	.append("option")
-	.text(d => d);
-	
-function updateTable() {
-	const selectedCountry = countrySelect.node().value;
-	const filtered = data.filter(d =>
-		d.country === selectedCountry
-	);
-	
-	const tbody = d3.select("#medalistTable");
-	tbody.selectAll("tr").remove();
-	
-	tbody.selectAll("tr")
-		.data(filtered)
-		.enter()
-		.append("tr")
-		.html(d => '<td>${d.athletes</td><td>${d.medal}</td><td>${d.year}</td>');
-	}
-	
-countrySelect.on("change", updateTable);
 });
-
-function showExplorer() {
-	d3.select("#narrative").classed("hidden", true);
-	d3.select("#explorer").classed("hidden", false);
-}
 </script>
 </body>
 </html>
