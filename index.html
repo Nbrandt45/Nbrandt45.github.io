@@ -105,7 +105,7 @@ focusSelect.on("change", function() {
 	.transition()
 	.duration(500)
 	.style("opacity", d => {
-		const country = d3.select(d3.event ? this : this).attr("data-country);
+		const country = d3.select(d3.event ? this : this).attr("data-country");
 		return (selected === "All" || d3.select(this.attr("data-country") === selected) ? 1 : 0.1;
 	});
 
