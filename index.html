@@ -34,8 +34,6 @@ data = csv.map(d => ({
 	medal: d.medal?.trim()
 })).filter(d => d.year && d.country && d.sport);
 
-console.log("Loaded CSV:", data);
-
 const svg = d3.select("#lineChart"),
 	width = +svg.attr("width")
 	height = +svg.attr("height"),
@@ -71,6 +69,14 @@ svg.append("g")
 svg.append("g")
 	.attr("transform", 'translate(${margin.left},0)')
 	.call(d3.axisLeft(y));
+	
+svg.append("text")
+	.attr("text-anchor", "middle")
+	.attr("transform", 'rotate(-90)')
+	.attr("x", -height / 2)
+	.attr("y", 15)
+	.attr("font-size", "12px")
+	.text("Medal Count per Country");
 
 const color = d3.scaleOrdinal(d3.schemeCategory10).domain(countries);
 
