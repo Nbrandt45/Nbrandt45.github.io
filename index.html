@@ -20,15 +20,6 @@
 	<label for="countrySelect">Country:</label>
 	<select id="countrySelect"></select>
 
-	<label for="sportSelect">Sport:</label>
-	<select for="sportSelect"></select>
-
-	<table border="1" style="margin-top:20px;">
-		<thead>
-			<tr><th>Athlete</th><th>Medal</th><th>Year</th></tr>
-		</thead>
-		<tbody id="medalistTable"></tbody>
-	</table>
 </div>
 	
 <script>
@@ -52,7 +43,6 @@ const svg = d3.select("#lineChart"),
 	
 const years = Array.from(new Set(data.map(d => +d.year))).sort();
 const countries = Array.from(new Set(data.map(d => d.country)));
-const sports = Array.from(new Set(data.map(d => d.sport))).sort();
 
 const medalCounts = d3.rollup(data,
 	v => v.length,
@@ -95,25 +85,17 @@ for (const country of countries) {
 }
 
 const countrySelect = d3.select("#countrySelect");
-const sportSelect = d3.select("#sportSelect");
 
 countrySelect.selectAll("option")
 	.data(countries)
 	.enter()
 	.append("option")
 	.text(d => d);
-
-sportSelect.selectAll("option")
-	.data(sports)
-	.enter()
-	.append("option")
-	.text(d => d);
 	
 function updateTable() {
 	const selectedCountry = countrySelect.node().value;
-	const selectedSport = sportSelect.node().value;
 	const filtered = data.filter(d =>
-		d.country === selectedCountry && d.sport === selectedSport
+		d.country === selectedCountry
 	);
 	
 	const tbody = d3.select("#medalistTable");
@@ -127,7 +109,6 @@ function updateTable() {
 	}
 	
 countrySelect.on("change", updateTable);
-sportSelect.on("change", updateTable);
 });
 
 function showExplorer() {
