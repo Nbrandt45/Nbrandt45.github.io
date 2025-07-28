@@ -11,10 +11,12 @@
 
 <h1>Olympic Games Medals by Country</h1>
 
-<label for="countryFocus">Select Country to view:</label>
-<select id="countryFocus">
-	<option value="All">All Countries</option>
-</select>
+<div id="countryFilter">
+	<label for="countryFocus">Select Country to view:</label>
+	<select id="countryFocus">
+		<option value="All">All Countries</option>
+	</select>
+</div>
 
 <div id="narrative">
 	<p> This chart shows the olympic medal counts for countries from 1896 to 2024</p>
@@ -23,8 +25,8 @@
 </div>
 
 <div id="explorer" class="hidden">
-	<h2>Explore Olympic Medalists</h2>
 	<button onclick="showNarrative()">Back to Olympic Chart</button>
+	<h2>Explore Olympic Medalists</h2>
     <label for="countrySelect">Country:</label>
     <select id="countrySelect"></select>
 
@@ -172,11 +174,13 @@ sportSelect.on("change", updateTable);
 function showExplorer() {
 d3.select("#narrative").classed("hidden", true);
 d3.select("#explorer").classed("hidden", false);
+d3.select("#countryFilter").classed("hidden", true);
 }
 
 function showNarrative() {
 d3.select("#narrative").classed("hidden", false);
 d3.select("#explorer").classed("hidden", true);
+d3.select("#countryFilter").classed("hidden", false);
 }
 </script>
 </body>
