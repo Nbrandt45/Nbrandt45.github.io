@@ -2,18 +2,35 @@
 <html>
 <script src='https://d3js.org/d3.v7.min.js'></script>
 <style>
-body {padding: 20px; }
-svg {margin-top: 20px; }
+	body {padding: 20px; }
+	svg {margin-top: 20px; }
 </style>
 <body>
 
 <h1>Olympic Games Medalists</h1>
 
 <div id="narrative">
-<p> This chart shows the olympic medal counts for countries from 1896 to 2024</p>
-<svg id="lineChart" width="1200" height="900"></svg>
+	<p> This chart shows the olympic medal counts for countries from 1896 to 2024</p>
+	<svg id="lineChart" width="1200" height="900"></svg>
+	<button onclick="showExplorer()">Explore Data</button>
 </div>
 
+<div id="explorer" class="hidden">
+	<h2>Explore Olympic Medalists</h2>
+	<label for="countrySelect">Country:</label>
+	<select id="countrySelect"></select>
+
+	<label for="sportSelect">Sport:</label>
+	<select for="sportSelect"></select>
+
+	<table border="1" style="margin-top:20px;">
+		<thead>
+			<tr><th>Athlete</th><th>Medal</th><th>Year</th></tr>
+		</thead>
+		<tbody id="medalistTable"></tbody>
+	</table>
+</div>
+	
 <script>
 let data;
 
@@ -34,27 +51,27 @@ const medalCounts = d3.rollup(data,
 	d => +d.year);
 	
 const x = d3.scaleLinear()
-.domain(d3.extent(years))
-.range([margin.left, width - margin.right]);
+	.domain(d3.extent(years))
+	.range([margin.left, width - margin.right]);
 
 const y = d3.scaleLinear()
-.domain([0, d3.max(countries, c =>
-d3.max(years, y => medalCounts.get(c)?.get(y) || 0)
-)]).nice()
-.range([height - margin.bottom, margin.top]);
+	.domain([0, d3.max(countries, c =>
+	d3.max(years, y => medalCounts.get(c)?.get(y) || 0)
+	)]).nice()
+	.range([height - margin.bottom, margin.top]);
 
 
 const line = d3.line()
-.x(d => x(d[0]))
-.y(d => y(d[1]));
+	.x(d => x(d[0]))
+	.y(d => y(d[1]));
 
 svg.append("g")
-.attr("transform", 'translate(0,${height - margin.bottom})')
-.call(d3.axisBottom(x).ticks(years.length).tickFormat(d3.format("d")));
+	.attr("transform", 'translate(0,${height - margin.bottom})')
+	.call(d3.axisBottom(x).ticks(years.length).tickFormat(d3.format("d")));
 
 svg.append("g")
-.attr("transform", 'translate(${margin.left},0)')
-.call(d3.axisLeft(y));
+	.attr("transform", 'translate(${margin.left},0)')
+	.call(d3.axisLeft(y));
 
 const color = d3.scaleOrdinal(d3.schemeCategory10).domain(countries);
 
@@ -67,7 +84,48 @@ for (const country of countries) {
 	.attr("stroke-width", 2)
 	.attr("d", line);
 }
+
+const countrySelect = d3.select("#countrySelect");
+const sportSelect = d3.select("#sportSelect");
+
+countrySelect.selectAll("option")
+	.data(countries)
+	.enter()
+	.append("option")
+	.text(d => d);
+	
+const sports = Array.from(new Set(data.map(d => d.sport)));
+sportSelect.selectAll("option")
+	.data(sports)
+	.enter()
+	.append("option")
+	.text(d => d);
+	
+function updateTable() {
+	const selectedCountry = countrySelect.node().value;
+	const selectedSport = sportSelect.node().value;
+	const filtered = data.filter(d =>
+		d.country === selectedCountry && d.sport === selectedSport
+	);
+	
+	const tbody = d3.select("#medalistTable");
+	tbody.selectAll("tr").remove();
+	
+	tbody.selectAll("tr")
+		.data(filtered)
+		.enter()
+		.append("tr")
+		.html(d => '<td>${d.athletes</td><td>${d.medal}</td><td>${d.year}</td>');
+	}
+	
+countrySelect.on("change", updateTable);
+sportSelect.on("change", updateTable);
 });
+
+function showExplorer() {
+	d3.select("#narrative").classed("hidden", true);
+	d3.select("#explorer").classes("hidden", false);
+}
 </script>
 </body>
 </html>
