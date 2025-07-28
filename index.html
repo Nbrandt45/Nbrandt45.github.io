@@ -9,6 +9,8 @@
 </style>
 <body>
 
+<div id="tooltip" style="position:absolute; background:white; border:1px solid #ccc; padding:5px; pointer-events:none; display:none;"></div>
+
 <h1>Olympic Games Medals by Country</h1>
 
 <div id="countryFilter">
@@ -41,7 +43,7 @@
 
 <div id="explorer" class="hidden">
 	<button onclick="showNarrative()">Back to Olympic Chart</button>
-	<h2>Explore Olympic Medalists</h2>
+	<h2>View Olympic Medalists</h2>
     <label for="countrySelect">Country:</label>
     <select id="countrySelect"></select>
 
@@ -181,8 +183,6 @@ function updateTable() {
 	.html(d => `<td>${d.athletes}</td><td>${d.medal}</td><td>${d.year}</td>`);
 }
 
-
-
 countrySelect.on("change", updateTable);
 sportSelect.on("change", updateTable);
 
@@ -219,6 +219,38 @@ function updateTopCountriesTable() {
 
 yearSelect.on("change", updateTopCountriesTable);
 updateTopCountriesTable();
+
+svg.selectAll(".country-dot")
+	.data(
+		countries.flatMap(country =>
+		years.map(year => ({
+			country,
+			year,
+			count: medalCounts.get(country)?.get(year) || 0
+			}))
+		)
+	)
+	.enter()
+	.append("circle")
+	.attr("class", "country-dot")
+	.attr("cx", d => x(d.year))
+	.attr("cy", d => y(d.count))
+	.attr("r", 3)
+	.attr("fill", d => color(d.country))
+	.attr("opacity", 0.7)
+	.on("mouseover", function (event, d) {
+		tooltip
+			.style("display", "block")
+			.html(`<strong>${d.country}</strong><br>Year: ${d.year}<br>Medals: ${d.count}`);
+	})
+	.on("mousemove", function (event) {
+		tooltip
+			.style("left", (event.pageX + 10) + "px")
+			.style("top", (event.pageY - 20) + "px");
+	})
+	.on("mouseout", function () {
+		tooltip.style("display", "none");
+	});
 
 });
 
