@@ -28,16 +28,6 @@
 <div id="topCountries" class="hidden">
 	<button onclick="showNarrative()">Back to Olympic Chart</button>
 	<h2>Top Olympic Countries by Year</h2>
-	<label for="topYear">Select Year:</label>
-	<select id="topYear></select>
-	
-	
-	<table border="1" style="margin-top:20px;">
-		<thead>
-		<tr><th>Rank</th><th>Country</th><th>Medals</th></tr>
-		</thead>
-		<tbody id="topCountriesTable"></tbody>
-	</table>
 </div>
 
 <div id="explorer" class="hidden">
@@ -182,6 +172,8 @@ function updateTable() {
 	.html(d => `<td>${d.athletes}</td><td>${d.medal}</td><td>${d.year}</td>`);
 }
 
+
+/*
 countrySelect.on("change", updateTable);
 sportSelect.on("change", updateTable);
 
@@ -214,9 +206,10 @@ function updateTopCountriesTable() {
 		.append("tr")
 		.html((d, i) => `<td>${i + 1}</td><td>${d[0]}</td><td>${d[1]}</td>`);
 }
+*/
 
-yearSelect.on("change", updateTopCountriesTable);
-updateTopCountriesTable();
+//yearSelect.on("change", updateTopCountriesTable);
+//updateTopCountriesTable();
 
 });
 
