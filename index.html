@@ -104,9 +104,9 @@ focusSelect.on("change", function() {
 	d3.selectAll(".country-line")
 	.transition()
 	.duration(500)
-	.style("opacity", d => {
-		const country = d3.select(d3.event ? this : this).attr("data-country");
-		return (selected === "All" || d3.select(this.attr("data-country") === selected) ? 1 : 0.1;
+	.style("opacity", function() {
+		const thisCountry = d3.select(this).attr("data-country");
+		return (selected === "All" || thisCountry === selected) ? 1 : 0.1;
 	});
 
 });
