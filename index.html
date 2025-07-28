@@ -7,14 +7,15 @@
 </style>
 <body>
 
-<h1>Olympic Games Medalists</h1>
+<h1>Olympic Games Medals by Country</h1>
+
+<label for="countryFocus">Select Country to view:</label>
+<select id="countryFocus">
+	<option value="All">All Countries</option>
+</select>
 
 <div id="narrative">
 	<p> This chart shows the olympic medal counts for countries from 1896 to 2024</p>
-	<label for="countryFocus">Select Country to view:</label>
-	<select id="countryFocus">
-		<option value="All">All Countries</option>
-	</select>
 	<svg id="lineChart" width="1200" height="900"></svg>
 </div>
 	
@@ -37,14 +38,6 @@ const svg = d3.select("#lineChart"),
 	
 const years = Array.from(new Set(data.map(d => +d.year))).sort();
 const countries = Array.from(new Set(data.map(d => d.country))).sort();
-
-const focusSelect = d3.select("#countryFocus");
-focusSelect.selectAll("option")
-	.data(["All", ...countries])
-	.enter()
-	.append("option")
-	.text(d => d)
-	.attr("value", d => d);
 
 const medalCounts = d3.rollup(data,
 	v => v.length,
@@ -96,6 +89,14 @@ for (const country of countries) {
 	.attr("data-country", country)
 	.attr("d", line);
 }
+
+const focusSelect = d3.select("#countryFocus");
+focusSelect.selectAll("option")
+	.data(["All", ...countries])
+	.enter()
+	.append("option")
+	.text(d => d)
+	.attr("value", d => d);
 
 focusSelect.on("change", function() {
 	const selected = this.value;
