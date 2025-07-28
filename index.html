@@ -1,7 +1,73 @@
 <!DOCTYPE html>
 <html>
+<script src='https://d3js.org/d3.v5.min.js'></script>
+<style>
+body {padding: 20px; }
+svg {margin-top: 20px; }
+</style>
 <body>
-<h1>Hello World</h1>
-<p>I'm hosted with GitHub Pages.</p>
+
+<h1>Olympic Games Medalists</h1>
+
+<div id="narrative">
+<p> This chart shows the olympic medal counts for countries from 1896 to 2024></p>
+<svg id="lineChart" width="600" height="300"></svg>
+</div>
+
+<script>
+let data;
+
+d3.csv("all_olympic_medalists.csv").then(csv => {
+data = csv;
+
+const svg = d3.select("#lineChart"),
+	width = +svg.attr("width")
+	height = +svg.attr("height"),
+	margin = {top: 20, right: 20, bottom: 30, left: 50};
+	
+const years = Array.from(new Set(data.map(d => +d.year))).sort();
+const countries = Array.from(new Set(data.map(d => d.country)));
+
+const medalCounts = d3.rollup(data,
+	v = v.length,
+	d = d.country,
+	d => +d.year);
+	
+const x = d3.scaleLinear()
+.domain(d3.extent(years))
+.range([margin.left, width - margin.right]);
+
+const y = d3.scaleLinear()
+.domain([0, d3.max(countries, c =>
+d3.max(years, y => medalCounts.get(c)?.get(y) || 0)
+)]).nice()
+.range([height - margin.bottom, margin.top]);
+
+
+const line = d3.line()
+.x(d => x(d[0]))
+.y(d => y(d[1]));
+
+svg.append("g")
+.attr("transform", 'translate(0,${height - margin.bottom})')
+.call(d3.axisBottom(x).ticks(years.length).tickFormat(d3.format("d")));
+
+svg.append("g")
+.attr("transform", 'translate(${margin.left},0)')
+.call(d3.axisLeft(y));
+
+const color = d3.scaleOrdinal(d3.schemeCategory10).domain(countries);
+
+for (const country of countries) {
+	const countryData = years.map(y => [y, medalCounts.get(country)?.get(y) || 0]);
+	svg.append("path")
+	.datum(countryData)
+	.attr("fill", "none")
+	.attr("stroke", color(country))
+	.attr("stroke-width", 2)
+	.attr("d", line);
+}
+});
+</script>
 </body>
 </html>
