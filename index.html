@@ -10,7 +10,7 @@ svg {margin-top: 20px; }
 <h1>Olympic Games Medalists</h1>
 
 <div id="narrative">
-<p> This chart shows the olympic medal counts for countries from 1896 to 2024></p>
+<p> This chart shows the olympic medal counts for countries from 1896 to 2024</p>
 <svg id="lineChart" width="600" height="300"></svg>
 </div>
 
@@ -29,8 +29,8 @@ const years = Array.from(new Set(data.map(d => +d.year))).sort();
 const countries = Array.from(new Set(data.map(d => d.country)));
 
 const medalCounts = d3.rollup(data,
-	v = v.length,
-	d = d.country,
+	v => v.length,
+	d => d.country,
 	d => +d.year);
 	
 const x = d3.scaleLinear()
