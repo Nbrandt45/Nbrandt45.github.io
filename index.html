@@ -26,6 +26,7 @@
 </div>
 
 <div id="topCountries" class="hidden">
+	<button onclick="showNarrative()">Back to Olympic Chart</button>
 	<h2>Top Olympic Countries by Year</h2>
 	<label for="topYear">Select Year:</label>
 	<select id="topYear></select>
@@ -37,8 +38,6 @@
 		</thead>
 		<tbody id="topCountriesTable"></tbody>
 	</table>
-
-  <button onclick="showNarrative()">Back to Olympic Chart</button>
 </div>
 
 <div id="explorer" class="hidden">
@@ -217,6 +216,7 @@ function updateTopCountriesTable() {
 }
 
 yearSelect.on("change", updateTopCountriesTable);
+updateTopCountriesTable();
 
 });
 
