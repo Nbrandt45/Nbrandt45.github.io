@@ -21,7 +21,24 @@
 <div id="narrative">
 	<p> This chart shows the olympic medal counts for countries from 1896 to 2024</p>
 	<svg id="lineChart" width="1200" height="900"></svg>
+	<button onclick="showTopCountries()">View Top Countries by Year</button>
 	<button onclick="showExplorer()">Explore Medalists</button>
+</div>
+
+<div id="topCountries" class="hidden">
+	<h2>Top Olympic Countries by Year</h2>
+	<label for="topYear">Select Year:</label>
+	<select id="topYear></select>
+	
+	
+	<table border="1" style="margin-top:20px;">
+		<thead>
+		<tr><th>Rank</th><th>Country</th><th>Medals</th></tr>
+		</thead>
+		<tbody id="topCountriesTable"></tbody>
+	</table>
+
+  <button onclick="showNarrative()">Back to Olympic Chart</button>
 </div>
 
 <div id="explorer" class="hidden">
@@ -49,7 +66,7 @@ data = csv.map(d => ({
 	year: +d.year,
 	country: d.country?.trim(),
 	sport: d.sport?.trim(),
-	athlete: d.athlete?.trim(),
+	athletes: d.athletes?.trim(),
 	medal: d.medal?.trim()
 })).filter(d => d.year && d.country && d.sport);
 
@@ -163,11 +180,43 @@ function updateTable() {
 	.data(filtered)
 	.enter()
 	.append("tr")
-	.html(d => `<td>${d.athlete}</td><td>${d.medal}</td><td>${d.year}</td>`);
+	.html(d => `<td>${d.athletes}</td><td>${d.medal}</td><td>${d.year}</td>`);
 }
 
 countrySelect.on("change", updateTable);
 sportSelect.on("change", updateTable);
+
+const yearSelect = d3.select("#topYear");
+yearSelect.selectAll("option")
+	.data(years)
+	.enter()
+	.append("option")
+	.text(d => d);
+	
+function updateTopCountriesTable() {
+	const selectedYear = +yearSelect.node().value;
+	const filtered = data.filter(d => d.year === selectedYear);
+	
+	const medalCount = d3.rollup(filtered,
+		v => v.length,
+		d => d.country
+	);
+	
+	const sorted = Array.from(medalCount.entries())
+		.sort((a,b) => d3.descending(a[1], b[1]))
+		.slice(0,10);
+		
+	const tbody = d3.select("#topCountriesTable");
+	tbody.selectAll("tr").remove();
+	
+	tbody.selectAll("tr")
+		.data(sorted)
+		.enter()
+		.append("tr")
+		.html((d, i) => `<td>${i + 1}</td><td>${d[0]}</td><td>${d[1]}</td>`);
+}
+
+yearSelect.on("change", updateTopCountriesTable);
 
 });
 
@@ -175,12 +224,21 @@ function showExplorer() {
 d3.select("#narrative").classed("hidden", true);
 d3.select("#explorer").classed("hidden", false);
 d3.select("#countryFilter").classed("hidden", true);
+d3.select("#topCountries").classed("hidden", true);
 }
 
 function showNarrative() {
 d3.select("#narrative").classed("hidden", false);
 d3.select("#explorer").classed("hidden", true);
 d3.select("#countryFilter").classed("hidden", false);
+d3.select("#topCountries").classed("hidden", true);
+}
+
+function showTopCountries() {
+d3.select("#narrative").classed("hidden", true);
+d3.select("#explorer").classed("hidden", true);
+d3.select("#countryFilter").classed("hidden", true);
+d3.select("#topCountries").classed("hidden", false);
 }
 </script>
 </body>
