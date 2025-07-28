@@ -4,6 +4,8 @@
 <style>
 	body {padding: 20px; }
 	svg {margin-top: 20px; }
+	.hidden {display: none; }
+	.country-line {transition: opacity 0.3s; }
 </style>
 <body>
 
@@ -17,6 +19,22 @@
 <div id="narrative">
 	<p> This chart shows the olympic medal counts for countries from 1896 to 2024</p>
 	<svg id="lineChart" width="1200" height="900"></svg>
+</div>
+
+<div id="explorer" class="hidden">
+	<h2>Explore Olympic Medalists</h2>
+    <label for="countrySelect">Country:</label>
+    <select id="countrySelect"></select>
+
+    <label for="sportSelect">Sport:</label>
+    <select id="sportSelect"></select>
+
+    <table border="1" style="margin-top:20px;">
+      <thead>
+        <tr><th>Athlete</th><th>Medal</th><th>Year</th></tr>
+      </thead>
+      <tbody id="medalistTable"></tbody>
+    </table>
 </div>
 	
 <script>
@@ -111,7 +129,48 @@ focusSelect.on("change", function() {
 
 });
 
+const countrySelect = d3.select("#countrySelect");
+countrySelect.selectAll("option")
+  .data(countries)
+  .enter()
+  .append("option")
+  .text(d => d);
+  
+const sports = Array.from(new Set(data.map(d => d.sport))).sort();
+const sportSelect = d3.select("#sportSelect");
+sportSelect.selectAll("option")
+  .data(sports)
+  .enter()
+  .append("option")
+  .text(d => d);
+  
+
+function updateTable() {
+  const selectedCountry = countrySelect.node().value;
+  const selectedSport = sportSelect.node().value;
+  const filtered = data.filter(d =>
+	d.country === selectedCountry && d.sport === selectedSport
+  );
+
+  const tbody = d3.select("#medalistTable");
+  tbody.selectAll("tr").remove();
+
+  tbody.selectAll("tr")
+	.data(filtered)
+	.enter()
+	.append("tr")
+	.html(d => `<td>${d.athlete}</td><td>${d.medal}</td><td>${d.year}</td>`);
+}
+
+countrySelect.on("change", updateTable);
+sportSelect.on("change", updateTable);
+
 });
+
+function showExplorer() {
+d3.select("#narrative").classed("hidden", true);
+d3.select("#explorer").classed("hidden", false);
+}
 </script>
 </body>
 </html>
