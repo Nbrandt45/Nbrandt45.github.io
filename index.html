@@ -35,7 +35,13 @@
 let data;
 
 d3.csv("all_olympic_medalists.csv").then(csv => {
-data = csv;
+data = csv.map(d => ({
+	year: +d.year,
+	country: d.country?.trim(),
+	sport: d.sport?.trim(),
+	athlete: d.athlete?.trim(),
+	medal: d.medal?.trim()
+})).filter(d => d.year && d.country && d.sport);
 
 const svg = d3.select("#lineChart"),
 	width = +svg.attr("width")
@@ -95,6 +101,7 @@ countrySelect.selectAll("option")
 	.text(d => d);
 	
 const sports = Array.from(new Set(data.map(d => d.sport)));
+
 sportSelect.selectAll("option")
 	.data(sports)
 	.enter()
