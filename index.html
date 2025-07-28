@@ -43,6 +43,8 @@ data = csv.map(d => ({
 	medal: d.medal?.trim()
 })).filter(d => d.year && d.country && d.sport);
 
+console.log("Loaded CSV:", data);
+
 const svg = d3.select("#lineChart"),
 	width = +svg.attr("width")
 	height = +svg.attr("height"),
@@ -50,6 +52,7 @@ const svg = d3.select("#lineChart"),
 	
 const years = Array.from(new Set(data.map(d => +d.year))).sort();
 const countries = Array.from(new Set(data.map(d => d.country)));
+const sports = Array.from(new Set(data.map(d => d.sport))).sort();
 
 const medalCounts = d3.rollup(data,
 	v => v.length,
@@ -99,8 +102,6 @@ countrySelect.selectAll("option")
 	.enter()
 	.append("option")
 	.text(d => d);
-	
-const sports = Array.from(new Set(data.map(d => d.sport)));
 
 sportSelect.selectAll("option")
 	.data(sports)
@@ -131,7 +132,7 @@ sportSelect.on("change", updateTable);
 
 function showExplorer() {
 	d3.select("#narrative").classed("hidden", true);
-	d3.select("#explorer").classes("hidden", false);
+	d3.select("#explorer").classed("hidden", false);
 }
 </script>
 </body>
